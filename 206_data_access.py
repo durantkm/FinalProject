@@ -11,9 +11,45 @@ import sqlite3
 from bs4 import BeautifulSoup
 
 
+#Set up code to create/open a cache:
+
+CACHE_FNAME = "206_data_access_cache.txt" #Cache file's name
+try: # Tries to open and read the cache file if it exists
+	CACHE_FNAME = open(CACHE_FNAME,'r')
+	cache_contents = cache_file.read()
+	cache_file.close()
+	CACHE_DICTION = json.loads(cache_contents)
+except: #If cache doesn't already exist will create a dictionary which will be the basis for the cache
+	CACHE_DICTION = {}
 
 
 
+#Create code for pulling webdata from the site/cache
+
+def GetWebPage_Data(url):
+	#Makes a connection from within the function to the variable CACHE_DICTION
+	#and CACHE_FNAME outside the function.
+	global CACHE_DICTION
+	global CACHE_FNAME
+
+	#If the passed url's info is already in the cache pull it and
+	#save it to the variable webdata.
+	if(str(url) in CACHE_DICTION):
+		webdata = CACHE_DICTION[str(url)]
+
+	#Else retrieve the data from the site, cache it, and save it to
+	#the variable webdata	
+	else:
+		response = request.get(str(url))
+		htmldoc = response.text
+		webdata = htmldoc
+		CACHE_DICTION[str(url)] = webdata
+		f = open(CACHE_FNAME,'w', encoding = "utf-8")
+		f.write(json.dumps(CACHE_DICTION))
+		f.close()
+
+	#Return the data related to the url
+	return webdata
 
 
 
