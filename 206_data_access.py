@@ -15,10 +15,10 @@ from bs4 import BeautifulSoup
 
 CACHE_FNAME = "206_data_access_cache.txt" #Cache file's name
 try: # Tries to open and read the cache file if it exists
-	CACHE_FNAME = open(CACHE_FNAME,'r')
+	cache_file = open(CACHE_FNAME,'r', encoding = "utf-8")
 	cache_contents = cache_file.read()
-	cache_file.close()
 	CACHE_DICTION = json.loads(cache_contents)
+	cache_file.close()
 except: #If cache doesn't already exist will create a dictionary which will be the basis for the cache
 	CACHE_DICTION = {}
 
@@ -40,18 +40,31 @@ def GetWebPage_Data(url):
 	#Else retrieve the data from the site, cache it, and save it to
 	#the variable webdata	
 	else:
-		response = request.get(str(url))
+		response = requests.get(str(url))
 		htmldoc = response.text
 		webdata = htmldoc
 		CACHE_DICTION[str(url)] = webdata
-		f = open(CACHE_FNAME,'w', encoding = "utf-8")
+		f = open(CACHE_FNAME,'w')
 		f.write(json.dumps(CACHE_DICTION))
 		f.close()
 
 	#Return the data related to the url
 	return webdata
 
+# Make a list containing urls for each available state webpage
+Homepage_htmldoc = GetWebPage_Data("https://www.nps.gov/index.htm") 
+Homepage_Soup = BeautifulSoup(Homepage_htmldoc,"html.parser")
+print(type(Homepage_Soup))
 
+State_urllst = []
+Homepage_links = Homepage_Soup.find_all("li")
+test_f = open("Homepage_links3.txt",'w', encoding = "utf-8")
+# for link in Homepage_links[4:60]:
+	# test_f.write(str(link.contents[0].attrs["href"])+"\n")#test_f.write(str(Homepage_links)+"\n")
+[State_urllst.append(link.contents[0].attrs["href"]) for link in Homepage_links[4:60] ]
+
+test_f.write(str(State_urllst))
+test_f.close
 
 
 
@@ -68,9 +81,9 @@ class Test_DictComprehension(unittest.TestCase):
 
 class Test_lstcomprehension(unittest.TestCase):
 	def check_is_lst(self):
-		self.assertEqual(type(State_parkandmonument_urllst), type([]))
+		self.assertEqual(type(State_urllst), type([]))
 	def check_num_list_items(self):
-		self.assertEqual(len(State_parkandmonument_urllist), 56)
+		self.assertEqual(len(State_urllist), 56)
 
 class Test_GetState_ParkandMonument_data(unittest.TestCase):
 	def GetState_return_type(self):
