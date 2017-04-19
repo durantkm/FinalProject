@@ -56,17 +56,70 @@ Homepage_htmldoc = GetWebPage_Data("https://www.nps.gov/index.htm")
 Homepage_Soup = BeautifulSoup(Homepage_htmldoc,"html.parser")
 print(type(Homepage_Soup))
 
-State_urllst = []
-Homepage_links = Homepage_Soup.find_all("li")
-test_f = open("Homepage_links3.txt",'w', encoding = "utf-8")
+State_urllst = [] # Creates variable for all the url lists
+Homepage_links = Homepage_Soup.find_all("li") #Makes a list of all link tag related html
+test_f = open("Homepage_links4.txt",'w', encoding = "utf-8")
 # for link in Homepage_links[4:60]:
 	# test_f.write(str(link.contents[0].attrs["href"])+"\n")#test_f.write(str(Homepage_links)+"\n")
-[State_urllst.append(link.contents[0].attrs["href"]) for link in Homepage_links[4:60] ]
 
-test_f.write(str(State_urllst))
-test_f.close
+#List Comp which creates a list of url for each state's page	
+[State_urllst.append(("https://www.nps.gov" + link.contents[0].attrs["href"], link.text)) for link in Homepage_links[4:60] ]
 
 
+#Per code writing tests
+# A_state = GetWebPage_Data(State_urllst[0][0])
+# A_state_soup = BeautifulSoup(A_state,"html.parser")
+# A_state_Search = A_state_soup.find_all("p")
+# for item in A_state_Search:
+# 	#if "a href" in str(item.contents):
+# 	test_f.write(str(item.text)+"\n")#test_f.write(str(Homepage_links)+"\n")
+
+# #test_f.write(str(A_state_Search))
+# test_f.close()
+
+
+	
+
+#Create the constructor portion of the NationalPark class
+class NationalPark:
+	def __init__(self, url):
+		self.state_webdata = GetWebPage_Data(url[0])
+		self.Location = url[1]
+		self.NationalPark_names =[]
+		self.NationalPark_description = []
+		
+		state_webdata_soup = BeautifulSoup(self.state_webdata,"html.parser")
+		MonumentorPark_h3data = state_webdata_soup.find_all("h3")
+		for h3 in MonumentorPark_h3data:
+			if "a href" in str(h3.contents):
+				self.NationalPark_names.append(h3.text)
+
+		MonumentorPark_desc = state_webdata_soup.find_all("p")
+		for desc in MonumentorPark_desc:
+			self.NationalPark_description.append(desc.text)#test_f.write(str(Homepage_links)+"\n")
+
+#Create methods which will allow you to access the national parks data
+
+	def Get_Location(self): # Method which returns person to get the location of related parks
+		return self.Location
+
+	def Get_Available_National_Parks(self):#Method returns a list of tuples with each available park name, state that its located in, and description
+		all_park_info =[]
+		i = 0
+		for item in self.NationalPark_names:
+			all_park_info.append((item,self.NationalPark_description[i],self.Location))
+			i = i + 1
+			return all_park_info
+#Create an instance and test
+Alabama_state_Parks = NationalPark(State_urllst[0])
+
+Alabama_Park_Info = Alabama_state_Parks.Get_Available_National_Parks()
+
+
+test_f = open("Homepage_links5.txt",'w', encoding = "utf-8")
+for item in Alabama 
+test_f.write(str(A_state_Search))
+test_f.close()
 
 
 
