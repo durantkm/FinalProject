@@ -110,16 +110,60 @@ class NationalPark:
 			all_park_info.append((item,self.NationalPark_description[i],self.Location))
 			i = i + 1
 			return all_park_info
-#Create an instance and test
-Alabama_state_Parks = NationalPark(State_urllst[0])
+#Create an instance of national class and get a list of available parks
 
-Alabama_Park_Info = Alabama_state_Parks.Get_Available_National_Parks()
+#A Created NationalPark class
+That_states_Parks = NationalPark(State_urllst[0])
+
+#Calls a method of the National Park that assigns the list of tuples with the park info to Alabama_Park_Info
+The_Park_Info = That_states_Parks.Get_Available_National_Parks()
+#Create code to set up database connection, cursor as well as the table
+#(database will be called Final_Project.db) 
+connection_FP = sqlite3.connect('Final_Project.db') #Sets up database and  its connection
+FP_cur = connection_FP.cursor() #Sets up the cursor
+
+try: #Drops the associated tables from the database if there (deletes it)
+	FP_cur.execute("DROP TABLE IF EXISTS Parks") 
+	connection_FP.commit()
+
+	FP_cur.execute("DROP TABLE IF EXISTS States")
+	connection_FP.commit()
+
+	FP_cur.execute("DROP TABLE IF EXISTS Articles")
+	connection_FP.commit()
+
+except: #If Table don't exist nothing happens
+	pass 
+
+#Creates the tables Parks,States, and Article
+creation_statement = "CREATE TABLE IF NOT EXISTS " 
+creation_statement += "Parks (Park_id DEFAULT INTEGER PRIMARY KEY, Park_Name TEXT, State TEXT, Description TEXT)"
+FP_cur.execute(creation_statement)
+connection_FP.commit()
+
+#creation_statement = "CREATE TABLE IF NOT EXISTS " 
+#creation_statement += "Users (user_id INTEGER PRIMARY KEY, screen_name TEXT, num_favs INTEGER, description TEXT )"
+#p3DB_cur.execute(creation_statement)
+#connection_p3DB.commit()
+
+#test_f = open("Homepage_links5.txt",'w', encoding = "utf-8")
 
 
-test_f = open("Homepage_links5.txt",'w', encoding = "utf-8")
-for item in Alabama 
-test_f.write(str(A_state_Search))
-test_f.close()
+#Write code to insert values into the table
+
+#The sequence that will be used for inserting values
+insert_sql = 'INSERT INTO Tweets VALUES (?, ?, ?, ?)'
+
+#the code that actually nserts the value
+for item in The_Park_Info:
+	Loc = item[2]
+	Nam = item[0]
+	Descip = item[1]
+	FPcur.execute(insert_sql, (NONE, Nam, Loc, Descip))
+	connection_FP.commit()
+
+#Closes database so its not locked
+FP_cur.close()
 
 
 
